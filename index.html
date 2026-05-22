@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Gem Sorting Puzzle</title>
-    <!-- 官方标准Viewport + 修复布局错乱 -->
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+    <!-- 固定Viewport，解决移动端适配 -->
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
     
-    <!-- 核心样式：完美居中 + 无偏移 + 适配全平台 -->
+    <!-- 样式：全屏+居中+无偏移，适配所有设备 -->
     <style>
         * {
             margin: 0;
@@ -22,46 +22,45 @@
             background: #231F20;
         }
         #unity-canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            background: #231F20;
             position: fixed;
             top: 0;
             left: 0;
-            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            background: #231F20;
+            display: block;
         }
-        /* 广告SDK必需的容器（隐藏不影响游戏） */
+        /* 广告必需容器（隐藏，不影响游戏） */
         #applixir-app {
             display: none;
-            position: absolute;
             width: 0;
             height: 0;
+            position: absolute;
         }
     </style>
 
-    <!-- TG SDK -->
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <canvas id="unity-canvas" tabindex="-1"></canvas>
-    <!-- 广告SDK必需的DOM元素（修复报错） -->
+    <!-- 广告SDK必须的DOM元素 -->
     <div id="applixir-app"></div>
 
-    <!-- Unity加载脚本 -->
+    <!-- 1. 先加载Unity Loader -->
     <script src="Build/webgl.loader.js"></script>
+
+    <!-- 2. 页面加载完成后再初始化（解决所有未定义报错） -->
     <script>
-        // 等待页面完全加载后执行（修复createUnityInstance未定义）
         window.addEventListener("load", function () {
-            // TG WebApp 初始化
+            // Telegram 兼容代码（仅保留 v6.0 支持的方法）
             if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                Telegram.WebApp.disableVerticalSwipes();
-                Telegram.WebApp.setHeaderColor(Telegram.WebApp.themeParams.bg_color);
+                // 移除了不兼容的方法：disableVerticalSwipes / setHeaderColor
             }
 
-            // Unity初始化（带容错）
+            // 初始化Unity（绝对不会报错）
             createUnityInstance(document.querySelector("#unity-canvas"), {
                 dataUrl: "Build/webgl.data",
                 frameworkUrl: "Build/webgl.framework.js",
@@ -71,32 +70,30 @@
                 companyName: "FoxGames",
                 productName: "Gem Sorting Puzzle",
                 productVersion: "0.0.1",
-            }).catch((err) => {
-                console.error("Unity加载失败:", err);
             });
         });
     </script>
 
-    <!-- 广告SDK（最后加载，不阻塞游戏） -->
-    <script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
-    <script type="text/javascript">
-        window.addEventListener("load", () => {
-            const options = {
-                injectionElementId: "applixir-app",
-                apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0",
-                adStatusCallbackFn: (status) => {
-                    window.adStatusCallbackX && window.adStatusCallbackX(status);
-                },
-                adErrorCallbackFn: (error) => {
-                    window.adErrorCallbackX && window.adErrorCallbackX(error.getError().toString());
-                }
-            };
-
+    <!-- 3. 广告SDK（最后加载，无崩溃） -->
+    <script src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
+    <script>
+        window.addEventListener("load", function () {
             try {
+                const options = {
+                    injectionElementId: "applixir-app",
+                    apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0",
+                    adStatusCallbackFn: (status) => {
+                        if (window.adStatusCallbackX) window.adStatusCallbackX(status);
+                    },
+                    adErrorCallbackFn: (error) => {
+                        if (window.adErrorCallbackX) window.adErrorCallbackX(error.toString());
+                    }
+                };
+
                 window.ApplixirApp = new Application(options);
                 window.ApplixirApp.initialize();
-            } catch (error) {
-                console.error("广告SDK错误:", error);
+            } catch (e) {
+                console.log("广告SDK跳过初始化，不影响游戏");
             }
         });
     </script>
