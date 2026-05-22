@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Gem Sorting Puzzle</title>
+
+    <!-- TG -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body style="text-align: center; padding: 0; border: 0; margin: 0;">
+    <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1" style="width: 1080px; height: 1920px; background: #231F20"></canvas>
+    <script src="Build/webgl.loader.js"></script>
+    <script>
+        window.unityInstance = null;
+        document.addEventListener("DOMContentLoaded", function(){
+            if(window.Telegram && window.Telegram.WebApp){
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                Telegram.WebApp.disableVerticalSwipes();
+
+                Telegram.WebApp.setHeaderColor(Telegram.WebApp.themeParams.bg_color);
+            }
+        });
+
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        dataUrl: "Build/webgl.data",
+        frameworkUrl: "Build/webgl.framework.js",
+        codeUrl: "Build/webgl.wasm",
+        symbolsUrl: "Build/webgl.symbols.json",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "FoxGames",
+        productName: "Gem Sorting Puzzle",
+        productVersion: "0.0.1",
+        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+      }).then((ins) => {
+          window.unityInstance = ins
+      });
+    </script>
+  <script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
+<script type="text/javascript">
+      const options = { 
+        injectionElementId: "applixir-app",
+        apiKey: "0f3a61ae-d7cb-4fd9-ad9d-5e340cdb59a6 ",
+        adStatusCallbackFn: (status) => {
+            window.adStatusCallbackX(status);
+        },
+        adErrorCallbackFn: (error) => {
+            window.adErrorCallbackX(error.getError().toString());
+        }
+      };
+
+      try {
+        window.ApplixirApp = new Application(options);
+      } catch (error) {
+        window.ApplixirApp = null;
+        console.error("Error creating Application:", error.message);
+      }
+      window.onload = () => {
+        if (window.ApplixirApp && typeof window.ApplixirApp.initialize === 'function') {
+            window.ApplixirApp.initialize();
+        } else {
+              console.error("ApplixirApp is not initialized properly.");
+        }
+      };
+</script>
+</body>
+</html>
