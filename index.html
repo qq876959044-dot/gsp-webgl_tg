@@ -1,46 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-us">
-<head>
+  <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Gem Sorting Puzzle</title>
-    <!-- 核心修复：全屏居中CSS -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            width: 100%;
-            height: 100vh;
-            /* 核心：弹性布局 垂直+水平居中 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #231F20;
-            overflow: hidden;
-        }
-        #unity-canvas {
-            /* 核心：自适应屏幕，保持比例，居中 */
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            background: #231F20;
-        }
-    </style>
 
     <!-- TG -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
-<body>
-    <!-- 移除固定宽高，交给CSS控制 -->
-    <canvas id="unity-canvas" tabindex="-1"></canvas>
-
+  </head>
+  <body>
+    <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
     <script src="Build/webgl.loader.js"></script>
+
     <script>
         window.unityInstance = null;
         document.addEventListener("DOMContentLoaded", function(){
@@ -48,6 +19,7 @@
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
                 Telegram.WebApp.disableVerticalSwipes();
+
                 Telegram.WebApp.setHeaderColor(Telegram.WebApp.themeParams.bg_color);
             }
         });
@@ -58,41 +30,67 @@
             codeUrl: "Build/webgl.wasm",
             symbolsUrl: "Build/webgl.symbols.json",
             streamingAssetsUrl: "StreamingAssets",
-            companyName: "FoxGames",
-            productName: "Gem Sorting Puzzle",
-            productVersion: "0.0.1",
-        }).then((ins) => {
-            window.unityInstance = ins
+            companyName: "TheVayuputra",
+            productName: "Arrow Escape",
+            productVersion: "1.01.01",
+            showBanner: false
+        }).then((ins)=>{
+            window.unityInstance = ins;
         });
     </script>
-
-    <!-- Applixir 广告代码（不动） -->
-    <script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
-    <script type="text/javascript">
-        const options = { 
-            injectionElementId: "applixir-app",
-            apiKey: "0f3a61ae-d7cb-4fd9-ad9d-5e340cdb59a6 ",
-            adStatusCallbackFn: (status) => {
-                window.adStatusCallbackX(status);
-            },
-            adErrorCallbackFn: (error) => {
-                window.adErrorCallbackX(error.getError().toString());
-            }
-        };
-
-        try {
-            window.ApplixirApp = new Application(options);
-        } catch (error) {
-            window.ApplixirApp = null;
-            console.error("Error creating Application:", error.message);
+  <script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
+<script type="text/javascript">
+      const options = { 
+        injectionElementId: "applixir-app",
+        apiKey: "0f3a61ae-d7cb-4fd9-ad9d-5e340cdb59a6 ",
+        adStatusCallbackFn: (status) => {
+            window.adStatusCallbackX(status);
+        },
+        adErrorCallbackFn: (error) => {
+            window.adErrorCallbackX(error.getError().toString());
         }
-        window.onload = () => {
-            if (window.ApplixirApp && typeof window.ApplixirApp.initialize === 'function') {
-                window.ApplixirApp.initialize();
-            } else {
-                console.error("ApplixirApp is not initialized properly.");
-            }
-        };
-    </script>
+      };
+
+      try {
+        window.ApplixirApp = new Application(options);
+      } catch (error) {
+        window.ApplixirApp = null;
+        console.error("Error creating Application:", error.message);
+      }
+      window.onload = () => {
+        if (window.ApplixirApp && typeof window.ApplixirApp.initialize === 'function') {
+            window.ApplixirApp.initialize();
+        } else {
+              console.error("ApplixirApp is not initialized properly.");
+        }
+      };
+</script>
+<script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
+<script type="text/javascript">
+      const options = { 
+        injectionElementId: "applixir-app",
+        apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0",
+        adStatusCallbackFn: (status) => {
+            window.adStatusCallbackX(status);
+        },
+        adErrorCallbackFn: (error) => {
+            window.adErrorCallbackX(error.getError().toString());
+        }
+      };
+
+      try {
+        window.ApplixirApp = new Application(options);
+      } catch (error) {
+        window.ApplixirApp = null;
+        console.error("Error creating Application:", error.message);
+      }
+      window.onload = () => {
+        if (window.ApplixirApp && typeof window.ApplixirApp.initialize === 'function') {
+            window.ApplixirApp.initialize();
+        } else {
+              console.error("ApplixirApp is not initialized properly.");
+        }
+      };
+</script>
 </body>
 </html>
