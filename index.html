@@ -1,81 +1,104 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Gem Sorting Puzzle</title>
+    <!-- 官方标准Viewport + 修复布局错乱 -->
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+    
+    <!-- 核心样式：完美居中 + 无偏移 + 适配全平台 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #231F20;
+        }
+        #unity-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: #231F20;
+            position: fixed;
+            top: 0;
+            left: 0;
+            object-fit: cover;
+        }
+        /* 广告SDK必需的容器（隐藏不影响游戏） */
+        #applixir-app {
+            display: none;
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+    </style>
 
-        <!-- TG -->
+    <!-- TG SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  </head>
-  <body style="text-align: center; padding: 0; border: 0; margin: 0;">
-    <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1" style="width: 1080px; height: 1920px; background: #231F20"></canvas>
+</head>
+<body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <!-- 广告SDK必需的DOM元素（修复报错） -->
+    <div id="applixir-app"></div>
+
+    <!-- Unity加载脚本 -->
     <script src="Build/webgl.loader.js"></script>
     <script>
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-
-        var canvas = document.querySelector("#unity-canvas");
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        canvas.style.position = "fixed";
-
-        document.body.style.textAlign = "left";
-      }
-
-      document.addEventListener("DOMContentLoaded", function(){
-            if(window.Telegram && window.Telegram.WebApp){
+        // 等待页面完全加载后执行（修复createUnityInstance未定义）
+        window.addEventListener("load", function () {
+            // TG WebApp 初始化
+            if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
                 Telegram.WebApp.disableVerticalSwipes();
-
                 Telegram.WebApp.setHeaderColor(Telegram.WebApp.themeParams.bg_color);
             }
+
+            // Unity初始化（带容错）
+            createUnityInstance(document.querySelector("#unity-canvas"), {
+                dataUrl: "Build/webgl.data",
+                frameworkUrl: "Build/webgl.framework.js",
+                codeUrl: "Build/webgl.wasm",
+                symbolsUrl: "Build/webgl.symbols.json",
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "FoxGames",
+                productName: "Gem Sorting Puzzle",
+                productVersion: "0.0.1",
+            }).catch((err) => {
+                console.error("Unity加载失败:", err);
+            });
         });
-
-      createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/webgl.data",
-        frameworkUrl: "Build/webgl.framework.js",
-        codeUrl: "Build/webgl.wasm",
-        symbolsUrl: "Build/webgl.symbols.json",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "FoxGames",
-        productName: "Gem Sorting Puzzle",
-        productVersion: "0.0.1",
-        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
-        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
-      });
     </script>
-<script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
-<script type="text/javascript">
-      const options = { 
-        injectionElementId: "applixir-app",
-        apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0",
-        adStatusCallbackFn: (status) => {
-            window.adStatusCallbackX(status);
-        },
-        adErrorCallbackFn: (error) => {
-            window.adErrorCallbackX(error.getError().toString());
-        }
-      };
 
-      try {
-        window.ApplixirApp = new Application(options);
-      } catch (error) {
-        window.ApplixirApp = null;
-        console.error("Error creating Application:", error.message);
-      }
-      window.onload = () => {
-        if (window.ApplixirApp && typeof window.ApplixirApp.initialize === 'function') {
-            window.ApplixirApp.initialize();
-        } else {
-              console.error("ApplixirApp is not initialized properly.");
-        }
-      };
-</script>
+    <!-- 广告SDK（最后加载，不阻塞游戏） -->
+    <script type="text/javascript" src="https://cdn.applixir.com/applixir.app.v6.0.1.js"></script>
+    <script type="text/javascript">
+        window.addEventListener("load", () => {
+            const options = {
+                injectionElementId: "applixir-app",
+                apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0",
+                adStatusCallbackFn: (status) => {
+                    window.adStatusCallbackX && window.adStatusCallbackX(status);
+                },
+                adErrorCallbackFn: (error) => {
+                    window.adErrorCallbackX && window.adErrorCallbackX(error.getError().toString());
+                }
+            };
+
+            try {
+                window.ApplixirApp = new Application(options);
+                window.ApplixirApp.initialize();
+            } catch (error) {
+                console.error("广告SDK错误:", error);
+            }
+        });
+    </script>
 </body>
 </html>
