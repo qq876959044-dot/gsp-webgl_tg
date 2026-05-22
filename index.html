@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<!-- 增加沙箱脚本权限允许 -->
+<html lang="en-us" sandbox="allow-scripts allow-same-origin allow-forms">
 <head>
     <meta charset="utf-8">
     <title>Gem Sorting Puzzle</title>
@@ -9,28 +10,58 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         html, body { width:100%; height:100vh; overflow:hidden; background:#231F20; }
         #unity-canvas { position:fixed; top:0; left:0; width:100%; height:100%; background:#231F20; }
-        #applixir-app { display:none; width:0; height:0; }
+        /* 广告容器固定渲染，隐藏不遮挡游戏 */
+        #applixir-app { position:absolute; width:1px; height:1px; left:-9999px; top:-9999px; display:block; }
     </style>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <!-- 容器前置渲染，杜绝null报错 -->
     <div id="applixir-app"></div>
 
-    <!-- 【关键】Unity 加载脚本，路径绝对正确 -->
     <script src="Build/webgl.loader.js"></script>
-
     <script>
-        // 【关键】等页面100%加载完再初始化Unity
-        window.onload = function(){
-            // TG 初始化
+        window.unityInstance = null;
+        window.applixirReady = false;
+
+        // TG基础初始化
+        function initTG() {
             if(window.Telegram?.WebApp){
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
             }
+        }
 
-            // 初始化Unity（Netlify 绝对不报错）
+        // 延后初始化广告，等Unity基础启动完毕
+        function lazyInitApplixir(){
+            setTimeout(()=>{
+                try{
+                    const app = new Application({
+                        injectionElementId: "applixir-app",
+                        apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0",
+                        adStatusCallbackFn: (status)=>{
+                            window.adStatusCallbackX?.call(null, status);
+                        },
+                        adErrorCallbackFn: (err)=>{
+                            window.adErrorCallbackX?.call(null, err?.toString()||"");
+                        }
+                    });
+                    app.initialize().then(()=>{
+                        window.ApplixirApp = app;
+                        window.applixirReady = true;
+                        console.log("Applixir 完全就绪，可调用广告");
+                    });
+                }catch(e){
+                    console.error("广告初始化异常",e);
+                }
+            }, 1200);
+        }
+
+        // 页面全部加载完成再启动Unity
+        window.onload = function(){
+            initTG();
             createUnityInstance(document.querySelector("#unity-canvas"), {
                 dataUrl: "Build/webgl.data",
                 frameworkUrl: "Build/webgl.framework.js",
@@ -40,21 +71,15 @@
                 companyName: "FoxGames",
                 productName: "Gem Sorting Puzzle",
                 productVersion: "0.0.1",
+            }).then(ins=>{
+                window.unityInstance = ins;
+                // Unity启动后再初始化广告
+                lazyInitApplixir();
             });
         }
     </script>
 
-    <!-- Applixir 广告（最后加载，不影响Unity） -->
+    <!-- 广告SDK延后加载 -->
     <script src="https://cdn.applixir.com/applixir.app.v6.0.1.js" defer></script>
-    <script>
-        window.addEventListener("load", ()=>{
-            try{
-                new Application({
-                    injectionElementId: "applixir-app",
-                    apiKey: "78b0120c-0022-4176-80c2-7ab200c0c9e0"
-                }).initialize();
-            }catch(e){}
-        })
-    </script>
 </body>
 </html>
